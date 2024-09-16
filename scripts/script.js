@@ -7,14 +7,22 @@ const res = document.getElementById("result");
 const toast = document.getElementById("toast");
 
 function calculate(value) {
-  const calculatedValue = eval(value || null);
-  if (isNaN(calculatedValue)) {
-    res.value = "Can't divide 0 with 0";
+  try {
+    // Using math.evaluate instead of eval
+    const calculatedValue = math.evaluate(value || '0');
+    if (isNaN(calculatedValue)) {
+      res.value = "Invalid operation";
+      setTimeout(() => {
+        res.value = "";
+      }, 1300);
+    } else {
+      res.value = calculatedValue;
+    }
+  } catch (error) {
+    res.value = "Error";
     setTimeout(() => {
       res.value = "";
     }, 1300);
-  } else {
-    res.value = calculatedValue;
   }
 }
 
@@ -27,11 +35,11 @@ function changeTheme() {
   if (theme.getAttribute("href") === lightTheme) {
     theme.setAttribute("href", darkTheme);
     themeIcon.setAttribute("src", sunIcon);
-    toast.innerHTML = "Calculator";
+    toast.innerHTML = "Dark Mode";
   } else {
     theme.setAttribute("href", lightTheme);
     themeIcon.setAttribute("src", moonIcon);
-    toast.innerHTML = "Calculator";
+    toast.innerHTML = "Light Mode";
   }
 }
 
@@ -43,66 +51,35 @@ function liveScreen(enteredValue) {
   res.value += enteredValue;
 }
 
-//adding event handler on the document to handle keyboard inputs
+// Adding event handler on the document to handle keyboard inputs
 document.addEventListener("keydown", keyboardInputHandler);
 
-//function to handle keyboard inputs
+// Function to handle keyboard inputs
 function keyboardInputHandler(e) {
-  // to fix the default behavior of browser,
-  // enter and backspace were causing undesired behavior when some key was already in focus.
-  e.preventDefault();
-  //grabbing the liveScreen
+  e.preventDefault(); // to fix default behavior issues
 
-  //numbers
-  if (e.key === "0") {
-    res.value += "0";
-  } else if (e.key === "1") {
-    res.value += "1";
-  } else if (e.key === "2") {
-    res.value += "2";
-  } else if (e.key === "3") {
-    res.value += "3";
-  } else if (e.key === "4") {
-    res.value += "4";
-  } else if (e.key === "5") {
-    res.value += "5";
-  } else if (e.key === "6") {
-    res.value += "6";
-  } else if (e.key === "7") {
-    res.value += "7";
-  } else if (e.key === "7") {
-    res.value += "7";
-  } else if (e.key === "8") {
-    res.value += "8";
-  } else if (e.key === "9") {
-    res.value += "9";
+  // Numbers
+  if (e.key >= "0" && e.key <= "9") {
+    res.value += e.key;
   }
 
-  //operators
-  if (e.key === "+") {
-    res.value += "+";
-  } else if (e.key === "-") {
-    res.value += "-";
-  } else if (e.key === "*") {
-    res.value += "*";
-  } else if (e.key === "/") {
-    res.value += "/";
+  // Operators
+  if (["+", "-", "*", "/"].includes(e.key)) {
+    res.value += e.key;
   }
 
-  //decimal key
+  // Decimal point
   if (e.key === ".") {
     res.value += ".";
   }
 
-  //press enter to see result
+  // Enter key to calculate result
   if (e.key === "Enter") {
-    calculate(result.value);
+    calculate(res.value);
   }
 
-  //backspace for removing the last input
+  // Backspace key to remove the last input
   if (e.key === "Backspace") {
-    const resultInput = res.value;
-    //remove the last element in the string
-    res.value = resultInput.substring(0, res.value.length - 1);
+    res.value = res.value.slice(0, -1);
   }
 }
